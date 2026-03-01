@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Sweet Journey</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&display=swap" rel="stylesheet">
+    <!-- Chart.js for Progress & Savings Visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-shell">
+        <header class="main-header">
+            <div class="header-content">
+                <h1 class="brand">Our Planner</h1>
+                <div class="header-actions">
+                    <div class="user-pill">
+                        <select id="userSelect">
+                            <option value="Him">Him</option>
+                            <option value="Her">Her</option>
+                        </select>
+                    </div>
+                    <div id="currentDate" class="date-badge"></div>
+                </div>
+            </div>
+        </header>
+
+        <nav class="tab-nav">
+            <button id="tabPlanner" class="tab-btn active">
+                <span class="icon">📝</span> Planner
+            </button>
+            <button id="tabSavings" class="tab-btn">
+                <span class="icon">💰</span> Savings
+            </button>
+            <button id="tabProgress" class="tab-btn">
+                <span class="icon">📈</span> Progress
+            </button>
+        </nav>
+
+        <main class="content-area">
+            <!-- Planner View -->
+            <div id="plannerView" class="view-container">
+                <div class="planner-grid">
+                    <aside class="planner-sidebar">
+                        <section class="card glass">
+                            <h3>Preferences</h3>
+                            <div class="input-group">
+                                <label>Difficulty Sort</label>
+                                <select id="sortPreference">
+                                    <option value="asc">Easy → Hard</option>
+                                    <option value="desc">Hard → Easy</option>
+                                </select>
+                            </div>
+                        </section>
+
+                        <section class="card glass">
+                            <h3>Add Task</h3>
+                            <form id="taskForm" class="vertical-form">
+                                <input type="text" id="taskName" placeholder="What's next, love?" required>
+                                <div class="form-row">
+                                    <select id="taskDifficulty">
+                                        <option value="Easy">Easy</option>
+                                        <option value="Medium" selected>Medium</option>
+                                        <option value="Hard">Hard</option>
+                                    </select>
+                                    <input type="date" id="taskDate" required>
+                                </div>
+                                <button type="submit" class="btn-submit">Add to List</button>
+                            </form>
+                        </section>
+                    </aside>
+
+                    <div class="planner-main">
+                        <div id="taskContainer">
+                            <section class="task-group" id="missedSection">
+                                <h2 class="group-title">Missed</h2>
+                                <div id="missedTasksList" class="task-list"></div>
+                            </section>
+
+                            <section class="task-group" id="todaySection">
+                                <h2 class="group-title">Today</h2>
+                                <div id="todayTasksList" class="task-list"></div>
+                            </section>
+
+                            <section class="task-group" id="upcomingSection">
+                                <h2 class="group-title">Upcoming</h2>
+                                <div id="upcomingTasksList" class="task-list"></div>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Savings View -->
+            <div id="savingsView" class="view-container" style="display: none;">
+                <div class="savings-grid">
+                    <aside class="savings-sidebar">
+                        <section class="card glass">
+                            <h3>Total Savings</h3>
+                            <div class="total-savings-display">
+                                <span class="currency">₹</span>
+                                <span id="totalSavingsValue">0.00</span>
+                            </div>
+                        </section>
+
+                        <section class="card glass">
+                            <h3>Add Saving</h3>
+                            <form id="savingsForm" class="vertical-form">
+                                <input type="number" id="savingAmount" placeholder="Amount" step="0.01" required>
+                                <input type="text" id="savingDesc" placeholder="What's this for?" required>
+                                <input type="date" id="savingDate" required>
+                                <button type="submit" class="btn-submit">Save Money</button>
+                            </form>
+                        </section>
+                    </aside>
+
+                    <div class="savings-main">
+                        <section class="card glass chart-card">
+                            <h3>Savings Over Time</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="savingsChart"></canvas>
+                            </div>
+                        </section>
+
+                        <section class="task-group">
+                            <h2 class="group-title">Recent Savings</h2>
+                            <div id="savingsList" class="task-list"></div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress View -->
+            <div id="progressView" class="view-container" style="display: none;">
+                <div class="progress-dashboard">
+                    <div class="stats-row">
+                        <div class="stat-card glass">
+                            <span class="label">Today's Completion</span>
+                            <div class="value-container">
+                                <span id="statTodayPercent" class="value">0%</span>
+                                <div class="progress-bar-mini"><div id="barToday" class="fill"></div></div>
+                            </div>
+                        </div>
+                        <div class="stat-card glass">
+                            <span class="label">Monthly Average</span>
+                            <div class="value-container">
+                                <span id="statMonthPercent" class="value">0%</span>
+                                <div class="progress-bar-mini"><div id="barMonth" class="fill"></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="charts-grid">
+                        <section class="card glass chart-card">
+                            <h3>Weekly Productivity</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="dailyChart"></canvas>
+                            </div>
+                        </section>
+
+                        <section class="card glass chart-card">
+                            <h3>Monthly Trends</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="monthlyChart"></canvas>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module" src="script.js"></script>
+</body>
+</html>
